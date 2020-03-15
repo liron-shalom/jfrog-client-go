@@ -1,14 +1,15 @@
 package artifactory
 
 import (
+	"io"
+
 	"github.com/jfrog/jfrog-client-go/artifactory/auth"
 	"github.com/jfrog/jfrog-client-go/artifactory/buildinfo"
 	rthttpclient "github.com/jfrog/jfrog-client-go/artifactory/httpclient"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
-	"github.com/jfrog/jfrog-client-go/artifactory/services/go"
+	_go "github.com/jfrog/jfrog-client-go/artifactory/services/go"
 	"github.com/jfrog/jfrog-client-go/artifactory/services/utils"
 	ioutils "github.com/jfrog/jfrog-client-go/utils/io"
-	"io"
 )
 
 type ArtifactoryServicesManager struct {
@@ -240,6 +241,24 @@ func (sm *ArtifactoryServicesManager) RevokeToken(params services.RevokeTokenPar
 	securityService := services.NewSecurityService(sm.client)
 	securityService.ArtDetails = sm.config.GetArtDetails()
 	return securityService.RevokeToken(params)
+}
+
+func (sm *ArtifactoryServicesManager) CreateReplication(isUpdate bool) *services.ReplicationService {
+	replicationService := services.NewReplicationService(sm.client, isUpdate)
+	replicationService.ArtDetails = sm.config.GetArtDetails()
+	return replicationService
+}
+
+func (sm *ArtifactoryServicesManager) DeleteReplication(repoKey string) error {
+	deleteReplicationService := services.NewDeleteReplicationService(sm.client)
+	deleteReplicationService.ArtDetails = sm.config.GetArtDetails()
+	return deleteReplicationService.Delete(repoKey)
+}
+
+func (sm *ArtifactoryServicesManager) ShowReplication(repoKey string) ([]services.PushReplicationParams, error) {
+	deleteReplicationService := services.NewShowReplicationService(sm.client)
+	deleteReplicationService.ArtDetails = sm.config.GetArtDetails()
+	return deleteReplicationService.Show(repoKey)
 }
 
 func (sm *ArtifactoryServicesManager) Client() *rthttpclient.ArtifactoryHttpClient {
