@@ -93,3 +93,7 @@ type PushReplicationParams struct {
 	Password string `json:"password"`
 	URL      string `json:"url"`
 }
+
+func NewPushReplicationParams() PushReplicationParams {
+	return PushReplicationParams{}
+}

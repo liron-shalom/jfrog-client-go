@@ -4,6 +4,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	"github.com/jfrog/jfrog-client-go/artifactory/auth"
 	rthttpclient "github.com/jfrog/jfrog-client-go/artifactory/httpclient"
 	"github.com/jfrog/jfrog-client-go/artifactory/services"
@@ -12,12 +19,6 @@ import (
 	clientutils "github.com/jfrog/jfrog-client-go/utils"
 	"github.com/jfrog/jfrog-client-go/utils/io/fileutils"
 	"github.com/jfrog/jfrog-client-go/utils/log"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 var RtUrl *string
@@ -33,6 +34,9 @@ var testsSearchService *services.SearchService
 var testsDeleteService *services.DeleteService
 var testsDownloadService *services.DownloadService
 var testsSecurityService *services.SecurityService
+var testsReplicationService *services.ReplicationService
+var testsReplicationShowService *services.ShowReplicationService
+var testsReplicationDeleteService *services.DeleteReplicationService
 
 const (
 	RtTargetRepo                     = "jfrog-client-tests-repo1/"
@@ -92,6 +96,30 @@ func createArtifactoryDownloadManager() {
 	testsDownloadService = services.NewDownloadService(client)
 	testsDownloadService.ArtDetails = artDetails
 	testsDownloadService.SetThreads(3)
+}
+
+func createArtifactoryReplicationManager() {
+	artDetails := getArtDetails()
+	client, err := rthttpclient.ArtifactoryClientBuilder().SetArtDetails(&artDetails).Build()
+	failOnHttpClientCreation(err)
+	testsReplicationService = services.NewReplicationService(client, false)
+	testsReplicationService.ArtDetails = artDetails
+}
+
+func createArtifactoryReplicationShowManager() {
+	artDetails := getArtDetails()
+	client, err := rthttpclient.ArtifactoryClientBuilder().SetArtDetails(&artDetails).Build()
+	failOnHttpClientCreation(err)
+	testsReplicationShowService = services.NewShowReplicationService(client)
+	testsReplicationShowService.ArtDetails = artDetails
+}
+
+func createArtifactoryReplicationDeleteManager() {
+	artDetails := getArtDetails()
+	client, err := rthttpclient.ArtifactoryClientBuilder().SetArtDetails(&artDetails).Build()
+	failOnHttpClientCreation(err)
+	testsReplicationDeleteService = services.NewDeleteReplicationService(client)
+	testsReplicationDeleteService.ArtDetails = artDetails
 }
 
 func failOnHttpClientCreation(err error) {
